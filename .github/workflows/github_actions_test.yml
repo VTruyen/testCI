@@ -1,0 +1,43 @@
+name: Run Flutter Tests in Docker and collect coverage
+
+# On which events the workflow should be triggered
+on:
+  push:
+    branches:
+      - main # Specify which branch triggers the workflow
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/cirruslabs/flutter:3.24.2 # Use a pre-built Flutter Docker image, you can specify a tag if needed
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Generate coverage report
+        run: |
+          genhtml coverage/lcov.info --output-directory coverage-report
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage-report
+
+      - name: Upload LCOV file
+        uses: actions/upload-artifact@v3
+        with:
+          name: lcov
+          path: coverage/lcov.info
