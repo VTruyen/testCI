@@ -3,7 +3,7 @@ name: Run Flutter Tests in Docker
 on:
   push:
     branches:
-      - master
+      - main
       - dev
       - feat/*
       - refactor/*
