@@ -43,12 +43,12 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
 
-#      - name: Build APK
-#        run: flutter build apk --release
-#
-#      - name: Archive APK
-#        run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
-#
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Archive APK
+        run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
+
 #  release:
 #    name: Create Release
 #    needs: build
