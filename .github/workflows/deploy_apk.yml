@@ -30,7 +30,7 @@ jobs:
       - name: Setup Keystore
         run: |
           mkdir -p ~/keystores
-          echo ${{ secrets.KEY_STORE }} | base64 --decode > android/app/publish_store.jks
+          echo "${{ secrets.KEY_STORE }}" | base64 --decode > android/app/publish_store.jks
 
       - name: Setup Keystore
         run: |
