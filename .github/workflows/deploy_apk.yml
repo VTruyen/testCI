@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,23 +48,30 @@ jobs:
       - name: Archive APK
         run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
 
+      - name: Rename APK
+        run: mv release/app-release.apk release/app-release-${{ github.ref_name }}.apk
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: release/app-release-${{ github.ref_name }}.apk
+
   release:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # Vérifie le dépôt
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Rename APK
-        run: mv release/app-release.apk release/app-release-${{ github.ref_name }}.apk
-
       # Télécharge l'APK depuis l'étape précédente
+      - name: Download APK artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: release-apk
+
       - name: Upload APK to GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: release/app-release.apk
+          artifacts: app-release-${{ github.ref_name }}.apk
           tag: ${{ github.ref_name }}
           token: ${{ secrets.TOKEN }}
           name: "Flutter TEST Release"
