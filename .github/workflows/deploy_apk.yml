@@ -34,9 +34,6 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
 
-      - name: Key Properties
-        run: echo ${{ secrets.KEY_PROPERTIES }} > android/key.properties
-
       - name: Check Properties
         run: cat android/key.properties
 
