@@ -1,0 +1,52 @@
+name: Deploy App APK on GitHub Releases
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create Keystore
+        run: echo ${{ secrets.KEYSTORE }} | base64 -d > /keystores/publish_store.jks
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Archive APK
+        run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # Vérifie le dépôt
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Télécharge l'APK depuis l'étape précédente
+      - name: Upload APK to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/app-release.apk
+          token: ${{ secrets.TOKEN }}
+          name: "Flutter TEST Release"
+          body: |
+            Ceci est un test de déploiement d'APK sur GitHub Releases.
+
+
