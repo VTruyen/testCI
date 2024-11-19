@@ -27,8 +27,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create Keystore
-        run: mkdir -p ~/keystores && echo ${{ secrets.KEY_STORE }} | base64 -d > ~/keystores/publish_store.jks
+      - name: Set up key.properties
+        run: |
+          echo "storeFile=${{ secrets.KEYSTORE_PATH }}" >> android/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
 
       - name: Key Properties
         run: echo ${{ secrets.KEY_PROPERTIES }} > android/key.properties
