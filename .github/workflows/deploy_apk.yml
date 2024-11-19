@@ -30,7 +30,7 @@ jobs:
       - name: Setup Keystore
         run: |
           mkdir -p ~/keystores
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > ~/keystores/publish_store.jks
+          echo ${{ secrets.KEY_STORE }} | base64 --decode > ~/keystores/publish_store.jks
 
       - name: Set up key.properties
         run: |
