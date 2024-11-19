@@ -22,7 +22,7 @@ jobs:
         run: flutter pub get
 
       - name: Create Keystore
-        run: echo ${{ secrets.KEY_STORE }} | base64 -d > /keystores/publish_store.jks
+        run: mkdir -p /keystores && echo ${{ secrets.KEY_STORE }} | base64 -d > /keystores/publish_store.jks
 
       - name: Key Properties
         run: echo ${{ secrets.KEY_PROPERTIES }} > android/key.properties
