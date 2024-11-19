@@ -22,7 +22,7 @@ jobs:
         run: flutter pub get
 
       - name: Create Keystore
-        run: echo ${{ secrets.KEYSTORE }} | base64 -d > /keystores/publish_store.jks
+        run: echo ${{ secrets.KEY_STORE }} | base64 -d > /keystores/publish_store.jks
 
       - name: Build APK
         run: flutter build apk --release
