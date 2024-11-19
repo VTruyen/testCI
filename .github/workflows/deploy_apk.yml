@@ -24,6 +24,9 @@ jobs:
       - name: Create Keystore
         run: echo ${{ secrets.KEY_STORE }} | base64 -d > /keystores/publish_store.jks
 
+      - name: Key Properties
+        run: echo ${{ secrets.KEY_PROPERTIES }} > android/key.properties
+
       - name: Build APK
         run: flutter build apk --release
 
