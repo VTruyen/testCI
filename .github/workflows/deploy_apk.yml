@@ -78,7 +78,7 @@ jobs:
       #     name: release-apk
 
       - name: Upload APK to GitHub Release
-        run: echo "{{ env.version }}"
+        run: echo "${{ env.version }}"
         # uses: ncipollo/release-action@v1
         # with:
         #   artifacts: app-release-v${{ env.version }}.apk
