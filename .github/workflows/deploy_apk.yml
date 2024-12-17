@@ -1,7 +1,9 @@
 name: Deploy App APK on GitHub Releases
 
 on:
-  push:
+  workflow_run:
+    workflows: [Quality Check]
+    types: [completed]
     branches:
       - main
 

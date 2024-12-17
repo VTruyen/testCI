@@ -1,4 +1,4 @@
-name: Run Flutter Tests in Docker
+name: Quality Check
 
 on:
   push:
