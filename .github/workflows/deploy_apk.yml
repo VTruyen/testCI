@@ -49,6 +49,7 @@ jobs:
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //g' | cut -d"+" -f1)
           echo "$VERSION" >> version.txt 
+          echo "SHARED_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Upload Version
         uses: actions/upload-artifact@v3
@@ -63,13 +64,13 @@ jobs:
         run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
 
       - name: Rename APK
-        run: mv release/app-release.apk release/app-release-v${{ cat version.txt }}.apk
+        run: mv release/app-release.apk release/app-release-v${{ env.SHARED_VERSION }}.apk
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v3
         with:
           name: release-apk
-          path: release/app-release-v${{ cat version.txt }}.apk
+          path: release/app-release-v${{ env.SHARED_VERSION }}.apk
 
   release:
     name: Create Release
@@ -87,14 +88,20 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: version
+
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          VERSION=$(cat version.txt)
+          echo "SHARED_VERSION=$VERSION" >> $GITHUB_ENV
       
       - name: Upload APK to GitHub Release
         uses: ncipollo/release-action@v1 
         with:
-          artifacts: app-release-v${{ cat version.txt }}.apk
-          tag: v${{ cat version.txt }}
+          artifacts: app-release-v${{ env.SHARED_VERSION }}.apk
+          tag: v${{ env.SHARED_VERSION }}
           token: ${{ secrets.TOKEN }}
-          name: "Flutter release v${{ cat version.txt }}"
+          name: "Flutter release v${{ env.SHARED_VERSION }}"
           body: |
             Ceci est un test de déploiement d'APK sur GitHub Releases.
         # run: |
