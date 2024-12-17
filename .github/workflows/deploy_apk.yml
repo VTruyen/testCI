@@ -7,9 +7,6 @@ on:
     branches:
       - main
 
-env:
-  VERSION: "version"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -51,7 +48,7 @@ jobs:
         id: extract_version
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //g' | cut -d"+" -f1)
-          echo "$VERSION"
+          echo "version=$VERSION" >> $GITHUB_ENV
 
       # - name: Build APK
       #   run: flutter build apk --release
@@ -80,7 +77,7 @@ jobs:
       #     name: release-apk
 
       - name: Upload APK to GitHub Release
-        run: echo "$VERSION"
+        run: echo "${{ needs.build.outputs.version }}"
         # uses: ncipollo/release-action@v1
         # with:
         #   artifacts: app-release-v${{ env.version }}.apk
