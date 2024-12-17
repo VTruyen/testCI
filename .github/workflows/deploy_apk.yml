@@ -48,6 +48,7 @@ jobs:
         id: extract_version
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //g' | cut -d"+" -f1)
+          echo "$VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
       # - name: Build APK
@@ -77,7 +78,7 @@ jobs:
       #     name: release-apk
 
       - name: Upload APK to GitHub Release
-        run: echo "v{{ env.version }}"
+        run: echo "env.version"
         # uses: ncipollo/release-action@v1
         # with:
         #   artifacts: app-release-v${{ env.version }}.apk
