@@ -42,6 +42,12 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
 
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //g' | cut -d"+" -f1)
+          echo "version=$VERSION" >> $GITHUB_ENV
+
       - name: Build APK
         run: flutter build apk --release
 
@@ -49,13 +55,13 @@ jobs:
         run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
 
       - name: Rename APK
-        run: mv release/app-release.apk release/app-release-${{ github.ref_name }}.apk
+        run: mv release/app-release.apk release/app-release-v${{ env.version }}.apk
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v3
         with:
           name: release-apk
-          path: release/app-release-${{ github.ref_name }}.apk
+          path: release/app-release-v${{ env.version }}.apk
 
   release:
     name: Create Release
@@ -71,10 +77,10 @@ jobs:
       - name: Upload APK to GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: app-release-${{ github.ref_name }}.apk
-          tag: ${{ github.ref_name }}
+          artifacts: app-release-v${{ env.version }}.apk
+          tag: v${{ env.version }}
           token: ${{ secrets.TOKEN }}
-          name: "Flutter TEST Release"
+          name: "Flutter release v${{ env.version }}"
           body: |
             Ceci est un test de déploiement d'APK sur GitHub Releases.
 
