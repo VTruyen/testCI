@@ -48,8 +48,13 @@ jobs:
         id: extract_version
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //g' | cut -d"+" -f1)
-          echo "::set-output name=version_number::$VERSION" 
+          echo "$VERSION" >> version.txt 
 
+      - name: Upload Version
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: version.txt
       # - name: Build APK
       #   run: flutter build apk --release
       #
@@ -76,8 +81,16 @@ jobs:
       #   with:
       #     name: release-apk
 
+      # Télécharge l'APK depuis l'étape précédente
+      - name: Download APK artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version
+      
       - name: Upload APK to GitHub Release
-        run: echo "${{ needs.build.steps.extract_version.outputs.version_number }}"        # uses: ncipollo/release-action@v1
+        run: |
+          VERSION=$(cat version.txt)
+          echo "$VERSION"
         # with:
         #   artifacts: app-release-v${{ env.version }}.apk
         #   tag: v${{ env.version }}
