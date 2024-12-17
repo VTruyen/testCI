@@ -14,36 +14,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Set up JDK 17
-      #   uses: actions/setup-java@v3
-      #   with:
-      #     distribution: 'temurin'
-      #     java-version: '17'
-      #
-      # - name: Set up Flutter
-      #   uses: subosito/flutter-action@v2
-      #   with:
-      #     flutter-version: "3.24.5"
-      #
-      # - name: Install dependencies
-      #   run: flutter pub get
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      # - name: Setup Keystore
-      #   run: |
-      #     mkdir -p ~/keystores
-      #     echo "${{ secrets.KEY_STORE }}" | base64 --decode > android/app/publish_store.jks
-      #
-      # - name: Setup Keystore
-      #   run: |
-      #     cat android/app/publish_store.jks
-      #
-      # - name: Set up key.properties
-      #   run: |
-      #     echo "storeFile=${{ secrets.KEYSTORE_PATH }}" >> android/key.properties
-      #     echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
-      #     echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-      #     echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-      #
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.5"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Keystore
+        run: |
+          mkdir -p ~/keystores
+          echo "${{ secrets.KEY_STORE }}" | base64 --decode > android/app/publish_store.jks
+
+      - name: Setup Keystore
+        run: |
+          cat android/app/publish_store.jks
+
+      - name: Set up key.properties
+        run: |
+          echo "storeFile=${{ secrets.KEYSTORE_PATH }}" >> android/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+
       - name: Extract version from pubspec.yaml
         id: extract_version
         run: |
@@ -55,20 +55,21 @@ jobs:
         with:
           name: version
           path: version.txt
-      # - name: Build APK
-      #   run: flutter build apk --release
-      #
-      # - name: Archive APK
-      #   run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
-      #
-      # - name: Rename APK
-      #   run: mv release/app-release.apk release/app-release-v${{ env.version }}.apk
-      #
-      # - name: Upload APK as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: release-apk
-      #     path: release/app-release-v${{ env.version }}.apk
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Archive APK
+        run: mkdir -p release && cp build/app/outputs/flutter-apk/app-release.apk release/
+
+      - name: Rename APK
+        run: mv release/app-release.apk release/app-release-v${{ cat version.txt }}.apk
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: release/app-release-v${{ cat version.txt }}.apk
 
   release:
     name: Create Release
@@ -76,27 +77,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Télécharge l'APK depuis l'étape précédente
-      # - name: Download APK artifact
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: release-apk
+      - name: Download APK artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: release-apk
 
       # Télécharge l'APK depuis l'étape précédente
-      - name: Download APK artifact
+      - name: Download Numéro de version
         uses: actions/download-artifact@v3
         with:
           name: version
       
       - name: Upload APK to GitHub Release
-        run: |
-          VERSION=$(cat version.txt)
-          echo "$VERSION"
-        # with:
-        #   artifacts: app-release-v${{ env.version }}.apk
-        #   tag: v${{ env.version }}
-        #   token: ${{ secrets.TOKEN }}
-        #   name: "Flutter release v${{ env.version }}"
-        #   body: |
-        #     Ceci est un test de déploiement d'APK sur GitHub Releases.
+        uses: ncipollo/release-action@v1 
+        with:
+          artifacts: app-release-v${{ cat version.txt }}.apk
+          tag: v${{ cat version.txt }}
+          token: ${{ secrets.TOKEN }}
+          name: "Flutter release v${{ cat version.txt }}"
+          body: |
+            Ceci est un test de déploiement d'APK sur GitHub Releases.
+        # run: |
+        #   VERSION=$(cat version.txt)
+        #   echo "$VERSION"
 
 
